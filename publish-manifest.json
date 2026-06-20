@@ -1,0 +1,12 @@
+{
+  "generated_at": "2026-06-20T14:50:49.649Z",
+  "index_file": "index.html",
+  "source_mode": "public",
+  "source_payload": "public_backend",
+  "source_snapshot": "live_meta_snapshot",
+  "rows": 6,
+  "reconciliation": null,
+  "secrets_embedded": false,
+  "publish_ready": true,
+  "visual_domain": "formou-eja-auditoria.nexus-ia.app"
+}

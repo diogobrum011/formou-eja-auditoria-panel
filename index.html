@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Formou EJA - Painel Nexus</title>
+  <style>
+    :root {
+      --ink: #101826;
+      --muted: #667085;
+      --paper: #f5f0e8;
+      --card: #fffaf1;
+      --navy: #102238;
+      --gold: #d8a43b;
+      --green: #16835b;
+      --red: #b84a4a;
+      --line: rgba(16, 34, 56, .12);
+      --shadow: 0 24px 70px rgba(16, 24, 38, .14);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-serif, Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(216,164,59,.2), transparent 32rem),
+        linear-gradient(135deg, #fbf6ec 0%, #ece6da 48%, #f8f4ec 100%);
+    }
+    button, textarea { font: inherit; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      backdrop-filter: blur(18px);
+      background: rgba(245,240,232,.86);
+      border-bottom: 1px solid var(--line);
+    }
+    .wrap { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
+    .topbar .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 0;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--navy);
+      font-weight: 800;
+      letter-spacing: -.04em;
+    }
+    .brand strong { display: block; font-size: 16px; }
+    .brand small { color: var(--muted); }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--ink);
+      padding: 9px 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn.primary { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .hero {
+      padding: 56px 0 34px;
+      display: grid;
+      grid-template-columns: 1.12fr .88fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+    .hero-main {
+      padding: 42px;
+      min-height: 420px;
+      border-radius: 34px;
+      color: #fff;
+      background:
+        linear-gradient(145deg, rgba(16,34,56,.95), rgba(10,20,34,.98)),
+        radial-gradient(circle at 80% 20%, rgba(216,164,59,.35), transparent 28rem);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-main:after {
+      content: "";
+      position: absolute;
+      inset: auto -90px -120px auto;
+      width: 330px;
+      height: 330px;
+      border-radius: 50%;
+      border: 48px solid rgba(216,164,59,.18);
+    }
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      font: 800 11px/1.2 ui-sans-serif, system-ui, sans-serif;
+      color: var(--gold);
+    }
+    h1 { margin: 18px 0; font-size: clamp(40px, 7vw, 86px); line-height: .92; letter-spacing: -.07em; }
+    h2 { margin: 0 0 16px; font-size: clamp(30px, 4vw, 54px); line-height: 1; letter-spacing: -.055em; }
+    h3 { margin: 0; font-size: 24px; letter-spacing: -.035em; }
+    .hero-main p { max-width: 690px; color: rgba(255,255,255,.72); font-size: 19px; line-height: 1.55; }
+    .hero-side {
+      padding: 28px;
+      border-radius: 34px;
+      background: rgba(255,250,241,.8);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+    .metric {
+      min-height: 130px;
+      border-radius: 24px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .metric span, .metric small { color: var(--muted); font: 700 12px/1.4 ui-sans-serif, system-ui, sans-serif; }
+    .metric strong { font: 900 clamp(25px, 3vw, 40px)/.95 ui-sans-serif, system-ui, sans-serif; letter-spacing: -.06em; }
+    .metric-green strong { color: var(--green); }
+    .metric-red strong { color: var(--red); }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 0 28px;
+    }
+    .tab {
+      border: 1px solid var(--line);
+      background: rgba(255,250,241,.7);
+      border-radius: 999px;
+      padding: 11px 15px;
+      cursor: pointer;
+      font: 800 13px/1 ui-sans-serif, system-ui, sans-serif;
+    }
+    .tab[aria-selected="true"] { color: #fff; background: var(--navy); border-color: var(--navy); }
+    .panel { display: none; padding-bottom: 54px; }
+    .panel.active { display: block; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      background: rgba(255,250,241,.82);
+      box-shadow: 0 18px 55px rgba(16, 24, 38, .08);
+      padding: 26px;
+    }
+    .table-wrap { overflow: auto; border-radius: 22px; border: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; background: var(--card); }
+    th, td { padding: 14px 16px; border-bottom: 1px solid var(--line); text-align: left; }
+    th { color: var(--muted); font: 800 12px/1 ui-sans-serif, system-ui, sans-serif; text-transform: uppercase; letter-spacing: .08em; }
+    .account-card dl {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 18px 0;
+    }
+    .account-card dt { color: var(--muted); font: 700 12px/1.2 ui-sans-serif, system-ui, sans-serif; }
+    .account-card dd { margin: 4px 0 0; font: 900 24px/.95 ui-sans-serif, system-ui, sans-serif; letter-spacing: -.04em; }
+    .reading-list { margin: 0; padding-left: 18px; color: var(--muted); line-height: 1.65; }
+    .report-stage { display: grid; gap: 20px; }
+    .slide {
+      aspect-ratio: 16 / 9;
+      min-height: 520px;
+      border-radius: 26px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 42px;
+      position: relative;
+      overflow: hidden;
+    }
+    .slide.dark { color: #fff; background: linear-gradient(135deg, #102238, #08111d); }
+    .slide.dark p { color: rgba(255,255,255,.72); }
+    .slide-number {
+      position: absolute;
+      right: 28px;
+      bottom: 24px;
+      color: rgba(16,24,38,.28);
+      font: 900 64px/.8 ui-sans-serif, system-ui, sans-serif;
+    }
+    .dark .slide-number { color: rgba(255,255,255,.16); }
+    .summary-box textarea {
+      width: 100%;
+      min-height: 260px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+      background: #fffdf8;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: rgba(22,131,91,.12);
+      color: var(--green);
+      font: 800 12px/1 ui-sans-serif, system-ui, sans-serif;
+    }
+    .footnote { color: var(--muted); font: 700 12px/1.5 ui-sans-serif, system-ui, sans-serif; margin-top: 18px; }
+    @media (max-width: 880px) {
+      .hero, .grid-2 { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: 1fr; }
+      .slide { min-height: auto; aspect-ratio: auto; }
+    }
+    @media print {
+      @page { size: landscape; margin: 0; }
+      body { background: #fff; }
+      .topbar, .tabs, .hero, .no-print, .panel:not(#relatorio), #gestao, #auditoria { display: none !important; }
+      .wrap { width: 100%; margin: 0; }
+      .panel { display: block !important; padding: 0; }
+      .report-stage { display: block; }
+      .slide {
+        page-break-after: always;
+        width: 100vw;
+        height: 100vh;
+        min-height: 100vh;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .summary-box { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <div class="brand">
+        <div class="mark">NX</div>
+        <div>
+          <strong>Formou EJA Insights</strong>
+          <small>Atualizado em 20/06/2026, 11:48</small>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" data-copy>Copiar resumo em texto</button>
+        <button class="btn primary" onclick="window.print()">Imprimir / PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-main">
+        <span class="eyebrow">Painel de Gestao - Nexus</span>
+        <h1>Formou EJA em leitura viva.</h1>
+        <p>Camada de gestao para acompanhar investimento, conversas e custo por conversa sem confundir sinal de Meta Ads com matricula validada no CRM.</p>
+        <span class="status-pill">Dados sincronizados via Codex</span>
+      </div>
+      <aside class="hero-side">
+        <span class="eyebrow">Periodo sincronizado</span>
+        <h3>14/06/2026 a 20/06/2026</h3>
+        <div class="metrics">
+          
+    <article class="metric metric-neutral">
+      <span>Investimento</span>
+      <strong>R$ 1.419,09</strong>
+      <small>Meta Ads</small>
+    </article>
+  
+          
+    <article class="metric metric-green">
+      <span>Conversas</span>
+      <strong>253</strong>
+      <small>Lead operacional</small>
+    </article>
+  
+          
+    <article class="metric metric-neutral">
+      <span>CPL</span>
+      <strong>R$ 5,61</strong>
+      <small>Custo por conversa</small>
+    </article>
+  
+          
+    <article class="metric metric-red">
+      <span>CRM</span>
+      <strong>Pendente</strong>
+      <small>Qualidade e matriculas</small>
+    </article>
+  
+        </div>
+      </aside>
+    </section>
+
+    <nav class="tabs no-print" aria-label="Areas do painel">
+      <button class="tab" aria-selected="true" data-tab="gestao">Gestao</button>
+      <button class="tab" aria-selected="false" data-tab="auditoria">Auditoria completa</button>
+      <button class="tab" aria-selected="false" data-tab="relatorio">Relatorio semanal</button>
+    </nav>
+
+    <section id="gestao" class="panel active">
+      <div class="grid-2">
+        <article class="card">
+          <span class="eyebrow">Decisao da semana</span>
+          <h2>Escalar so depois do CRM.</h2>
+          <p>A performance de conversas esta ativa e mensurada. A decisao de verba ainda precisa cruzar qualidade comercial, matriculas e motivos de perda.</p>
+          <p class="footnote">Regra: nao tratar conversa Meta como matricula, lead qualificado ou receita.</p>
+        </article>
+        <article class="card">
+          <span class="eyebrow">Serie diaria</span>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Data</th><th>Invest.</th><th>Conversas</th><th>CPL</th></tr></thead>
+              <tbody>
+        <tr>
+          <td>15/06/2026</td>
+          <td>R$ 45,18</td>
+          <td>6</td>
+          <td>R$ 7,53</td>
+        </tr>
+      
+        <tr>
+          <td>16/06/2026</td>
+          <td>R$ 279,57</td>
+          <td>48</td>
+          <td>R$ 5,82</td>
+        </tr>
+      
+        <tr>
+          <td>17/06/2026</td>
+          <td>R$ 470,06</td>
+          <td>74</td>
+          <td>R$ 6,35</td>
+        </tr>
+      
+        <tr>
+          <td>18/06/2026</td>
+          <td>R$ 355,39</td>
+          <td>78</td>
+          <td>R$ 4,56</td>
+        </tr>
+      
+        <tr>
+          <td>19/06/2026</td>
+          <td>R$ 268,89</td>
+          <td>47</td>
+          <td>R$ 5,72</td>
+        </tr>
+      
+        <tr>
+          <td>20/06/2026</td>
+          <td>R$ 0,00</td>
+          <td>0</td>
+          <td>Pendente</td>
+        </tr>
+      </tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="auditoria" class="panel">
+      <div class="grid-2">
+        
+        <article class="account-card">
+          <div>
+            <span class="eyebrow">C01</span>
+            <h3>Conta atual</h3>
+          </div>
+          <dl>
+            <div><dt>Campanhas ativas</dt><dd>0</dd></div>
+            <div><dt>Campanhas pausadas</dt><dd>14</dd></div>
+            <div><dt>Investimento</dt><dd>R$ 651,28</dd></div>
+            <div><dt>Conversas</dt><dd>139</dd></div>
+            <div><dt>Custo por conversa</dt><dd>R$ 4,69</dd></div>
+          </dl>
+          <p>Em leitura somente leitura atual, a C01 aparece com 0 campanhas alvo ativas e 14 pausadas. A fotografia antiga de estrutura integralmente pausada nao deve mais ser usada no painel.</p>
+        </article>
+      
+        <article class="account-card">
+          <div>
+            <span class="eyebrow">C02</span>
+            <h3>Conta paralela</h3>
+          </div>
+          <dl>
+            <div><dt>Campanhas ativas</dt><dd>12</dd></div>
+            <div><dt>Campanhas pausadas</dt><dd>2</dd></div>
+            <div><dt>Investimento</dt><dd>R$ 767,81</dd></div>
+            <div><dt>Conversas</dt><dd>114</dd></div>
+            <div><dt>Custo por conversa</dt><dd>R$ 6,74</dd></div>
+          </dl>
+          <p>A C02 opera via copias com budget lifetime; 12 campanhas alvo estao ativas e 2 pausadas. O total lifetime ativo visivel e R$ 4275,00; qualquer equivalencia diaria e apenas estimativa operacional.</p>
+        </article>
+      
+      </div>
+      <article class="card" style="margin-top:18px">
+        <span class="eyebrow">Leitura publica segura</span>
+        <ul class="reading-list"><li>Leitura live somente leitura em 20/06/2026, 11:48 BRT.</li><li>A fotografia anterior de estrutura integralmente pausada ficou obsoleta para status atual.</li><li>Nao tratar a leitura live como autorizacao de gasto, publicacao, pausa, ativacao ou transferencia de verba.</li><li>Qualificacao comercial, matriculas e custo por matricula continuam pendentes de CRM/WhatsApp.</li></ul>
+      </article>
+    </section>
+
+    <section id="relatorio" class="panel">
+      <div class="summary-box card no-print">
+        <span class="eyebrow">Resumo em texto</span>
+        <h2>Texto curto para acompanhar o PDF</h2>
+        <textarea readonly data-summary>Relatorio semanal - Formou EJA
+Periodo: 14/06/2026 a 20/06/2026
+
+Destaques da semana:
+- Investimento: R$ 1.419,09
+- Conversas/leads operacionais: 253
+- Custo por conversa: R$ 5,61
+- Status comercial: aguardando validacao de WhatsApp/CRM
+
+Leitura Nexus:
+O painel consolida a entrega das duas contas no periodo e ja recebe os dados Meta atualizados. A leitura comercial ainda depende de conciliacao com WhatsApp/CRM antes de qualquer decisao de escala.
+
+Proximas acoes:
+1. Validar qualidade e matriculas no WhatsApp/CRM.
+2. Manter comparativo entre camada atual e camada paralela.
+3. Revisar criativos e fadiga antes de qualquer decisao de verba.
+
+PDF em anexo com os detalhes.</textarea>
+      </div>
+      <div class="report-stage">
+        <section class="slide dark">
+          <span class="eyebrow">Relatorio semanal - Formou EJA</span>
+          <h1>14/06/2026 a 20/06/2026</h1>
+          <p>Analise de Inteligencia Nexus com dados atuais de investimento, conversas e custo por conversa. Indicadores comerciais permanecem pendentes ate conciliacao de WhatsApp/CRM.</p>
+          <div class="slide-number">01</div>
+        </section>
+        <section class="slide">
+          <span class="eyebrow">Investimento e resultado</span>
+          <h2>R$ 1.419,09 investidos</h2>
+          <div class="metrics">
+            
+    <article class="metric metric-green">
+      <span>Conversas</span>
+      <strong>253</strong>
+      <small>Mensagens iniciadas</small>
+    </article>
+  
+            
+    <article class="metric metric-neutral">
+      <span>CPL</span>
+      <strong>R$ 5,61</strong>
+      <small>Custo por conversa</small>
+    </article>
+  
+            
+    <article class="metric metric-neutral">
+      <span>Qualidade</span>
+      <strong>Pendente CRM</strong>
+      <small>Sem estimativa</small>
+    </article>
+  
+            
+    <article class="metric metric-red">
+      <span>Matriculas</span>
+      <strong>Pendente</strong>
+      <small>Sem fonte validada</small>
+    </article>
+  
+          </div>
+          <div class="slide-number">02</div>
+        </section>
+        <section class="slide">
+          <span class="eyebrow">Diagnostico Nexus</span>
+          <h2>A entrega existe. A decisao comercial ainda nao.</h2>
+          <p>As duas contas Meta Ads ja alimentam o painel com dados atuais do periodo. O status operacional de cada conta permanece separado na auditoria. O proximo salto de confiabilidade depende de conciliacao entre conversa, lead qualificado e matricula.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Data</th><th>Investimento</th><th>Conversas</th><th>CPL</th></tr></thead>
+              <tbody>
+        <tr>
+          <td>15/06/2026</td>
+          <td>R$ 45,18</td>
+          <td>6</td>
+          <td>R$ 7,53</td>
+        </tr>
+      
+        <tr>
+          <td>16/06/2026</td>
+          <td>R$ 279,57</td>
+          <td>48</td>
+          <td>R$ 5,82</td>
+        </tr>
+      
+        <tr>
+          <td>17/06/2026</td>
+          <td>R$ 470,06</td>
+          <td>74</td>
+          <td>R$ 6,35</td>
+        </tr>
+      
+        <tr>
+          <td>18/06/2026</td>
+          <td>R$ 355,39</td>
+          <td>78</td>
+          <td>R$ 4,56</td>
+        </tr>
+      
+        <tr>
+          <td>19/06/2026</td>
+          <td>R$ 268,89</td>
+          <td>47</td>
+          <td>R$ 5,72</td>
+        </tr>
+      
+        <tr>
+          <td>20/06/2026</td>
+          <td>R$ 0,00</td>
+          <td>0</td>
+          <td>Pendente</td>
+        </tr>
+      </tbody>
+            </table>
+          </div>
+          <div class="slide-number">03</div>
+        </section>
+        <section class="slide dark">
+          <span class="eyebrow">Plano de acao</span>
+          <h2>Semana seguinte</h2>
+          <p>1. Validar qualidade e matriculas no WhatsApp/CRM.<br>2. Comparar C01 e C02 sem alterar verba por impulso.<br>3. Revisar criativos antes de qualquer escala.</p>
+          <div class="slide-number">04</div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script type="application/json" id="panel-data">{&quot;generatedAt&quot;:&quot;2026-06-20T14:50:49.648Z&quot;,&quot;sourcePayload&quot;:&quot;public_backend&quot;,&quot;sourceSnapshot&quot;:&quot;live_meta_snapshot&quot;,&quot;periodLabel&quot;:&quot;14/06/2026 a 20/06/2026&quot;,&quot;rows&quot;:[{&quot;client_slug&quot;:&quot;formou-eja&quot;,&quot;date&quot;:&quot;2026-06-15&quot;,&quot;invest&quot;:45.18,&quot;leads&quot;:6,&quot;cpl&quot;:7.53,&quot;updated_at&quot;:&quot;2026-06-20T14:48:37.34677+00:00&quot;,&quot;source&quot;:&quot;codex&quot;},{&quot;client_slug&quot;:&quot;formou-eja&quot;,&quot;date&quot;:&quot;2026-06-16&quot;,&quot;invest&quot;:279.57,&quot;leads&quot;:48,&quot;cpl&quot;:5.82,&quot;updated_at&quot;:&quot;2026-06-20T14:48:38.442567+00:00&quot;,&quot;source&quot;:&quot;codex&quot;},{&quot;client_slug&quot;:&quot;formou-eja&quot;,&quot;date&quot;:&quot;2026-06-17&quot;,&quot;invest&quot;:470.06,&quot;leads&quot;:74,&quot;cpl&quot;:6.35,&quot;updated_at&quot;:&quot;2026-06-20T14:48:39.254964+00:00&quot;,&quot;source&quot;:&quot;codex&quot;},{&quot;client_slug&quot;:&quot;formou-eja&quot;,&quot;date&quot;:&quot;2026-06-18&quot;,&quot;invest&quot;:355.39,&quot;leads&quot;:78,&quot;cpl&quot;:4.56,&quot;updated_at&quot;:&quot;2026-06-20T14:48:40.268309+00:00&quot;,&quot;source&quot;:&quot;codex&quot;},{&quot;client_slug&quot;:&quot;formou-eja&quot;,&quot;date&quot;:&quot;2026-06-19&quot;,&quot;invest&quot;:268.89,&quot;leads&quot;:47,&quot;cpl&quot;:5.72,&quot;updated_at&quot;:&quot;2026-06-20T14:48:41.219224+00:00&quot;,&quot;source&quot;:&quot;codex&quot;},{&quot;client_slug&quot;:&quot;formou-eja&quot;,&quot;date&quot;:&quot;2026-06-20&quot;,&quot;invest&quot;:0,&quot;leads&quot;:0,&quot;cpl&quot;:null,&quot;updated_at&quot;:&quot;2026-06-20T14:48:41.58536+00:00&quot;,&quot;source&quot;:&quot;codex&quot;}]}</script>
+  <script>
+    const tabs = document.querySelectorAll('[data-tab]');
+    const panels = document.querySelectorAll('.panel');
+    tabs.forEach((tab) => tab.addEventListener('click', () => {
+      tabs.forEach((item) => item.setAttribute('aria-selected', String(item === tab)));
+      panels.forEach((panel) => panel.classList.toggle('active', panel.id === tab.dataset.tab));
+    }));
+    document.querySelector('[data-copy]').addEventListener('click', async () => {
+      const text = document.querySelector('[data-summary]').value;
+      await navigator.clipboard.writeText(text);
+      document.querySelector('[data-copy]').textContent = 'Resumo copiado';
+      setTimeout(() => document.querySelector('[data-copy]').textContent = 'Copiar resumo em texto', 1800);
+    });
+  </script>
+</body>
+</html>
